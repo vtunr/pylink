@@ -82,7 +82,7 @@ class Library(object):
         'JLINK_SetFlashProgProgressCallback'
     ]
 
-    JLINK_SDK_NAME = 'libjlinkarm'
+    JLINK_SDK_NAME = 'jlinkarm'
 
     WINDOWS_32_JLINK_SDK_NAME = 'JLinkARM'
     WINDOWS_64_JLINK_SDK_NAME = 'JLink_x64'
@@ -337,20 +337,7 @@ class Library(object):
         else:
             suffix = '.so'
 
-        # Copy the J-Link DLL to a temporary file.  This will be cleaned up the
-        # next time we load a DLL using this library or if this library is
-        # cleaned up.
-        tf = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
-        with open(tf.name, 'wb') as outputfile:
-            with open(self._path, 'rb') as inputfile:
-                outputfile.write(inputfile.read())
-
-        # This is needed to work around a WindowsError where the file is not
-        # being properly cleaned up after exiting the with statement.
-        tf.close()
-
-        self._temp = tf
-        self._lib = ctypes.cdll.LoadLibrary(tf.name)
+        self._lib = ctypes.cdll.LoadLibrary(self._path)
 
         if self._windows:
             # The J-Link library uses a mix of __cdecl and __stdcall function
